@@ -8,7 +8,7 @@ class TextAlign {
     '<path d="M21 9.5H3M21 4.5H3M21 14.5H3M21 19.5H3"/>';
 
   static get isInline() {
-    return false; // Set to false to ensure it works with block content
+    return true; // Set to false to ensure it works with block content
   }
 
   static get sanitize() {
