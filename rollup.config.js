@@ -12,24 +12,16 @@ export default [
       file: pkg.browser,
       format: "umd",
     },
-    plugins: [
-      resolve(), // so Rollup can find dependencies
-      commonjs(), // so Rollup can convert dependencies to ES modules
-      terser(), // to minify the UMD build
-    ],
+    plugins: [resolve(), commonjs(), terser()],
   },
 
   // CommonJS (for Node) and ES module (for bundlers) build
   {
     input: "src/main.js",
     output: [
-      { file: pkg.main, format: "cjs" },
+      { file: pkg.main, format: "cjs", exports: "auto" }, // Explicitly set exports to auto
       { file: pkg.module, format: "es" },
     ],
-    plugins: [
-      resolve(), // so Rollup can find dependencies
-      commonjs(), // so Rollup can convert dependencies to ES modules
-      terser(), // to minify the CJS and ES builds
-    ],
+    plugins: [resolve(), commonjs(), terser()],
   },
 ];
