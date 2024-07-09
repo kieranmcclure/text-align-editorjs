@@ -8,94 +8,121 @@ class TextAlign {
     '<path d="M21 9.5H3M21 4.5H3M21 14.5H3M21 19.5H3"/>';
 
   static get isInline() {
-    return true;
+    return false; // Set to false to ensure it works with block content
   }
 
-  constructor({ api }) {
-    this.currenticon =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="square" stroke-linejoin="arcs"></svg>';
-    this.aligncurrenticon = new DOMParser().parseFromString(
-      this.currenticon,
-      "application/xml"
-    );
-    this.button = null;
-    this.state = "left";
-    this.api = api;
-  }
-
-  render() {
-    this.button = document.createElement("button");
-    this.button.classList = "ce-inline-tool ce-inline-tool--align-text";
-    this.button.appendChild(
-      this.button.ownerDocument.importNode(
-        this.aligncurrenticon.documentElement,
-        true
-      )
-    );
-    this.setIcon();
-    return this.button;
-  }
-
-  surround(range) {
-    const firstParentNode = this.getParentNode(range.commonAncestorContainer);
-    if (this.state === "left") {
-      firstParentNode.style.textAlign = "center";
-      this.state = "center";
-    } else if (this.state === "center") {
-      firstParentNode.style.textAlign = "right";
-      this.state = "right";
-    } else if (this.state === "right") {
-      firstParentNode.style.textAlign = "justify";
-      this.state = "justify";
-    } else if (this.state === "justify") {
-      firstParentNode.style.textAlign = "left";
-      this.state = "left";
-    }
-  }
-
-  checkState(text) {
-    if (!text) {
-      return;
-    }
-    this.setIcon();
-  }
-
-  getParentNode(node) {
-    if (
-      node?.parentNode?.tagName === "DIV" ||
-      node?.parentNode?.tagName === "P"
-    ) {
-      return node.parentNode;
-    } else {
-      return this.getParentNode(node.parentNode);
-    }
-  }
-
-  setIcon() {
-    if (this.state === "" || this.state === "left") {
-      this.button.childNodes[0].innerHTML = TextAlign.leftAlignedIcon;
-    } else if (this.state === "center") {
-      this.button.childNodes[0].innerHTML = TextAlign.centerAlignedIcon;
-    } else if (this.state === "right") {
-      this.button.childNodes[0].innerHTML = TextAlign.rightAlignedIcon;
-    } else if (this.state === "justify") {
-      this.button.childNodes[0].innerHTML = TextAlign.justifyAlignedIcon;
-    }
-  }
-
-  static save(blockContent) {
-    const alignment = blockContent.style.textAlign || "left";
+  static get sanitize() {
     return {
-      alignment,
-      text: blockContent.innerHTML,
+      text: {
+        br: true,
+      },
+      alignment: {},
     };
   }
 
-  static render({ alignment, text }) {
-    const div = document.createElement("div");
-    div.style.textAlign = alignment;
-    div.innerHTML = text;
-    return div;
+  static get toolbox() {
+    return {
+      icon: "<svg></svg>", // Add your icon here
+      title: "Text Align",
+    };
+  }
+
+  constructor({ data, config, api }) {
+    this.api = api;
+    this.data = {
+      text: data.text || "",
+      alignment: data.alignment || "left",
+    };
+
+    this.settings = [
+      {
+        name: "left",
+        icon: TextAlign.leftAlignedIcon,
+      },
+      {
+        name: "center",
+        icon: TextAlign.centerAlignedIcon,
+      },
+      {
+        name: "right",
+        icon: TextAlign.rightAlignedIcon,
+      },
+      {
+        name: "justify",
+        icon: TextAlign.justifyAlignedIcon,
+      },
+    ];
+
+    this._CSS = {
+      wrapper: "ce-paragraph",
+      alignment: {
+        left: "ce-paragraph--left",
+        center: "ce-paragraph--center",
+        right: "ce-paragraph--right",
+        justify: "ce-paragraph--justify",
+      },
+    };
+  }
+
+  render() {
+    this._element = document.createElement("div");
+    this._element.classList.add(this._CSS.wrapper);
+    this._element.classList.add(this._CSS.alignment[this.data.alignment]);
+    this._element.contentEditable = true;
+    this._element.innerHTML = this.data.text;
+
+    this._element.addEventListener("keyup", () => {
+      this.data.text = this._element.innerHTML;
+    });
+
+    return this._element;
+  }
+
+  save(blockContent) {
+    return {
+      text: blockContent.innerHTML,
+      alignment: this.data.alignment,
+    };
+  }
+
+  renderSettings() {
+    const wrapper = document.createElement("div");
+
+    this.settings.forEach((tune) => {
+      const button = document.createElement("div");
+      button.classList.add("cdx-settings-button");
+      button.innerHTML = tune.icon;
+
+      if (this.data.alignment === tune.name) {
+        button.classList.add(this.api.styles.settingsButtonActive);
+      }
+
+      button.addEventListener("click", () => {
+        this._toggleTune(tune.name);
+
+        wrapper.querySelectorAll(".cdx-settings-button").forEach((btn) => {
+          btn.classList.remove(this.api.styles.settingsButtonActive);
+        });
+
+        button.classList.add(this.api.styles.settingsButtonActive);
+      });
+
+      wrapper.appendChild(button);
+    });
+
+    return wrapper;
+  }
+
+  _toggleTune(tune) {
+    this.data.alignment = tune;
+
+    this._element.classList.remove(
+      this._CSS.alignment.left,
+      this._CSS.alignment.center,
+      this._CSS.alignment.right,
+      this._CSS.alignment.justify
+    );
+    this._element.classList.add(this._CSS.alignment[tune]);
   }
 }
 
