@@ -1,5 +1,5 @@
 {
-  "name": "@canburaks/text-align-editorjs",
+  "name": "text-align-editorjs",
   "version": "1.1.0",
   "main": "dist/text-align.cjs.js",
   "module": "dist/text-align.esm.js",
