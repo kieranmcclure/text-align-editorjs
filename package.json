@@ -8,7 +8,8 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.0.6",
-    "rollup": "^2.58.0"
+    "rollup": "^2.58.0",
+    "rollup-plugin-terser": "^7.0.2"
   },
   "scripts": {
     "build": "rollup -c",
@@ -25,16 +26,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/canburaks/text-align-editorjs.git"
+    "url": "git+https://github.com/kieranmcclure/text-align-editorjs.git"
   },
   "keywords": [
     "editorjs",
     "editor-js"
   ],
-  "author": "Can Burak Sofyalıoğlu",
+  "author": "Kieran McClure",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/canburaks/text-align-editorjs/issues"
+    "url": "https://github.com/kieranmcclure/text-align-editorjs/issues"
   },
-  "homepage": "https://github.com/canburaks/text-align-editorjs#readme"
+  "homepage": "https://github.com/kieranmcclure/text-align-editorjs#readme"
 }
